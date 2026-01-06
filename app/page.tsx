@@ -3,9 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Send, MessageCircle, Loader2, X, Minus } from 'lucide-react'
+import { Send, Loader2, RotateCcw, FileText } from 'react-icons/fa'
 
 interface Message {
   id: string
@@ -15,13 +14,13 @@ interface Message {
 }
 
 const SUGGESTED_QUESTIONS = [
-  'What are your main products?',
-  'How can I get support?',
-  'What is your pricing?',
-  'Do you offer refunds?'
+  'What is the main topic of this document?',
+  'Can you summarize the key points?',
+  'What are the main findings?',
+  'How is this document structured?'
 ]
 
-const AGENT_ID = '6931e4ac1f3e985c1e357ec1'
+const AGENT_ID = '695d1f1028280d857b8d249c'
 
 export default function HomePage() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -43,7 +42,7 @@ export default function HomePage() {
     const welcomeMessage: Message = {
       id: '0',
       type: 'agent',
-      text: 'Hi! How can I help you today?',
+      text: 'Welcome to PDF Assistant! I can help you find information in your PDF documents. Ask me anything about A SIM.pdf and I\'ll search through the content to provide you with accurate answers.',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
@@ -111,146 +110,134 @@ export default function HomePage() {
     const welcomeMessage: Message = {
       id: '0',
       type: 'agent',
-      text: 'Hi! How can I help you today?',
+      text: 'Welcome to PDF Assistant! I can help you find information in your PDF documents. Ask me anything about A SIM.pdf and I\'ll search through the content to provide you with accurate answers.',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
   }
 
-  if (isMinimized) {
-    return (
-      <div className="fixed bottom-4 right-4 z-50">
-        <Button
-          onClick={() => setIsMinimized(false)}
-          className="rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 shadow-lg"
-        >
-          <MessageCircle className="w-6 h-6" />
-        </Button>
-      </div>
-    )
-  }
-
   return (
-    <div className="fixed bottom-4 right-4 w-96 h-screen-sm max-h-[600px] bg-white rounded-lg shadow-2xl flex flex-col z-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5" />
-          <div>
-            <h2 className="font-semibold text-sm">Support Chat</h2>
-            <p className="text-xs text-blue-100">Always here to help</p>
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FileText className="text-blue-600 text-lg" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">PDF Assistant</h1>
+              <p className="text-sm text-slate-500">Ask questions about your documents</p>
+            </div>
           </div>
-        </div>
-        <div className="flex gap-1">
           <Button
-            variant="ghost"
+            onClick={handleClearChat}
+            variant="outline"
             size="sm"
-            onClick={() => setIsMinimized(true)}
-            className="text-white hover:bg-blue-500 h-8 w-8 p-0"
+            className="gap-2 border-slate-300"
           >
-            <Minus className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsMinimized(true)}
-            className="text-white hover:bg-blue-500 h-8 w-8 p-0"
-          >
-            <X className="w-4 h-4" />
+            <RotateCcw className="text-sm" />
+            Clear Chat
           </Button>
         </div>
       </div>
 
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 p-4 bg-gray-50">
-        <div className="space-y-4" ref={scrollRef}>
-          {messages.map(message => (
-            <div
-              key={message.id}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-6 p-6" ref={scrollRef}>
+            {messages.map(message => (
               <div
-                className={`max-w-xs px-4 py-2 rounded-lg shadow-sm ${
-                  message.type === 'user'
-                    ? 'bg-blue-600 text-white rounded-br-none'
-                    : 'bg-white text-gray-900 border border-gray-200 rounded-bl-none'
-                }`}
+                key={message.id}
+                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="text-sm leading-relaxed">{message.text}</p>
-                <p
-                  className={`text-xs mt-1 ${
-                    message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
+                <div
+                  className={`max-w-2xl px-5 py-3 rounded-xl shadow-sm ${
+                    message.type === 'user'
+                      ? 'bg-blue-600 text-white rounded-br-xl'
+                      : 'bg-white text-slate-900 border border-slate-200 rounded-bl-xl'
                   }`}
                 >
-                  {message.timestamp.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex justify-start">
-              <div className="bg-white text-gray-900 px-4 py-2 rounded-lg border border-gray-200 rounded-bl-none">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                  <p
+                    className={`text-xs mt-2 ${
+                      message.type === 'user' ? 'text-blue-100' : 'text-slate-500'
+                    }`}
+                  >
+                    {message.timestamp.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
                 </div>
               </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+            ))}
+
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-white text-slate-900 px-5 py-3 rounded-xl border border-slate-200 rounded-bl-xl">
+                  <div className="flex gap-2 items-center">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                    <span className="text-sm text-slate-600">Searching document...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Suggested Questions - Show only if no messages except welcome */}
-      {messages.length === 1 && (
-        <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
-          <p className="text-xs text-gray-600 font-medium mb-2">Suggested questions:</p>
-          <div className="space-y-2">
-            {SUGGESTED_QUESTIONS.map((question, idx) => (
-              <button
-                key={idx}
-                onClick={e =>
-                  handleSubmit(e as unknown as React.FormEvent, question)
-                }
-                className="w-full text-left px-3 py-2 text-xs bg-white border border-gray-200 rounded hover:bg-gray-100 text-gray-700 transition-colors"
-              >
-                {question}
-              </button>
-            ))}
+      {messages.length === 1 && !loading && (
+        <div className="bg-white border-t border-slate-200 max-w-4xl mx-auto w-full">
+          <div className="px-6 py-6">
+            <p className="text-sm font-semibold text-slate-700 mb-4">Suggested questions:</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {SUGGESTED_QUESTIONS.map((question, idx) => (
+                <button
+                  key={idx}
+                  onClick={e =>
+                    handleSubmit(e as unknown as React.FormEvent, question)
+                  }
+                  className="text-left px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 text-slate-700 text-sm transition-all duration-200 font-medium"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 p-3 bg-white rounded-b-lg">
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="Type your question..."
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            disabled={loading}
-            className="flex-1 text-sm border-gray-300 focus:border-blue-500"
-            autoFocus
-          />
-          <Button
-            type="submit"
-            disabled={!input.trim() || loading}
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-          </Button>
-        </form>
+      <div className="bg-white border-t border-slate-200 sticky bottom-0">
+        <div className="max-w-4xl mx-auto px-6 py-5">
+          <form onSubmit={handleSubmit} className="flex gap-3">
+            <Input
+              type="text"
+              placeholder="Ask a question about your PDF..."
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              disabled={loading}
+              className="flex-1 text-sm border-slate-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+              autoFocus
+            />
+            <Button
+              type="submit"
+              disabled={!input.trim() || loading}
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">Send</span>
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   )
